@@ -1,0 +1,21 @@
+{
+  "name": "peak-panic",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.7",
+    "vite": "^8.3.6"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "express": "^5.3.0",
+    "pg": "^8.23.1",
+    "phaser": "^4.2.1"
+  }
+}
