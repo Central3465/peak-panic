@@ -8,6 +8,8 @@ export default class GameScene extends Phaser.Scene {
         this.highestY = 500
         this.nextPlatformY = 450
         this.gameOver = false
+        this.peachCount = 0 // 🍑 i love peaches
+        this.lastPlatformX = 0
     }
 
     create() {
@@ -16,6 +18,8 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor("#9bd8ed")
 
         this.platforms = this.physics.add.staticGroup()
+
+        this.peaches = this.physics.add.group({ allowGravity: true, immovable: true})
 
         this.createPlatform(width / 2, 500)
 
@@ -26,9 +30,11 @@ export default class GameScene extends Phaser.Scene {
         this.player.body.setSize(24, 30)
         this.player.body.setCollideWorldBounds(false)
         this.player.body.setGravityY(900)
-        this.player.body.setVelocityY(-450) // idk why it says it might not exist even though the tooltip has it
+        this.player.body.setVelocityY(-500) // idk why it says it might not exist even though the tooltip has it
 
         this.physics.add.collider(this.player, this.platforms, this.bounce, (player) => player.body.velocity.y > 0, this) // callback
+
+        this.physics.add.overlap(this.player, this.peaches, this.collectPeach, null, this) // for player to collect peaches
         
         this.cursors = this.input.keyboard.createCursorKeys()
         this.keys = this.input.keyboard.addKeys({ up: Phaser.Input.Keyboard.KeyCodes.W, down: Phaser.Input.Keyboard.KeyCodes.S, left: Phaser.Input.Keyboard.KeyCodes.A, right: Phaser.Input.Keyboard.KeyCodes.D })
@@ -42,6 +48,10 @@ export default class GameScene extends Phaser.Scene {
         this.scoreText = this.add.text(16, 16, "Altitude: 0m", { fontSize: "20px", fontFamily: "monospace", color: "#17324d", fontStyle: "bold"})
         this.scoreText.setScrollFactor(0)
         this.scoreText.setDepth(10)
+
+        this.peachText = this.add.text(16, 48, "Peaches: 0", { fontSize: "16px", fontFamily: "monospace", color: "#ffffff", fontStyle: "bold", stroke: "#17324d", strokeThickness: 3})
+        this.peachText.setScrollFactor(0)
+        this.peachText.setDepth(10)
         
         this.gameOverText = this.add.text(width / 2, height / 2, "Game over!", { fontSize: "26px", fontFamily: "monospace", color: "#ffffff", align: "center", backgroundColor: "#17324d", padding: {x: 16, y: 16}})
         this.gameOverText.setOrigin(0.5)
@@ -50,31 +60,37 @@ export default class GameScene extends Phaser.Scene {
         this.gameOverText.setDepth(20)
     }
 
-    createPlatform(x, y) {
-        const platform = this.add.rectangle(x, y, 90, 14, 0x426b45) // ohhh the color is hex
+    createPlatform(x, y, width = 90) {
+        const platform = this.add.rectangle(x, y, width, 14, 0x426b45) // ohhh the color is hex
 
         this.physics.add.existing(platform, true)
         this.platforms.add(platform)
+
+        this.lastPlatformX = x
 
         return platform
     }
 
     bounce(player, platform) {
         if (player.body.velocity.y > 0) {
-            player.body.setVelocityY(-450)
+            player.body.setVelocityY(-500)
         }
     }
 
     generatePlatforms() {
-        const width = this.scale.width;
+        const width = this.scale.width
         const cameraTop = this.cameras.main.scrollY - 900
-
-        while (this.nextPlatformY > cameraTop) {
-            const x = Phaser.Math.Between(55, width - 55)
-
-            this.createPlatform(x, this.nextPlatformY)
-
-            this.nextPlatformY -= Phaser.Math.Between(95, 135)
+        while (this.nextPlatformer > cameraTop) {
+            const difficulty = Math.min(this.score / 1000, 1)
+            const platformWidth = Math.max(58, 90 - Math.floor(difficulty * 25))
+            const gap = Phaser.Math.Between(85, 100 + Math.floor(difficulty * 12)) // make platforms narrow so game is harder
+            const maxShift = 110 + Math.floor(difficulty * 30) 
+            const x = Phaser.Math.Clamp(this.lastPlatformX + Phaser.Math.Between(-maxShift, maxShift), 55, width - 55)
+            this.createPlatform(x, this.nextPlatformY, platformWidth)
+            if (Math.random() < 0.75) {
+                this.createPeach(x, this.nextPlatformY - 30)
+            }
+            this.nextPlatformY -= gap;
         }
     }
 
@@ -99,8 +115,10 @@ export default class GameScene extends Phaser.Scene {
 
         this.highestY = Math.min(this.highestY, this.player.y) // calculate altitude
 
+        const totalScore = this.score + this.peachCount * 50
+
         this.score = Math.max(0, Math.floor((500 - this.highestY) / 10))
-        this.scoreText.setText(`Altitude: ${this.score}m`)
+        this.scoreText.setText(`Altitude: ${this.score}m\nScore: ${totalScore} peaches`)
 
         this.generatePlatforms()
 
@@ -110,15 +128,40 @@ export default class GameScene extends Phaser.Scene {
             }
         })
 
+        this.peaches.children.iterate((peach) => {
+            if (peach && peach.y > this.cameras.main.scrollY + this.scale.height + 100) {
+                peach.destroy()
+            }
+        })
+
         if (this.player.y > this.cameras.main.scrollY + this.scale.height + 100) {
             this.endGame() // check if player has fallen off lol
         }
     }
 
+    createPeach(x, y) {
+        const peach = this.add.circle(x, y, 9, 0xffa34d)
+
+        this.physics.add.existing(peach)
+
+        peach.body.setAllowGravity(false)
+        peach.body.setImmovable(true)
+
+        this.peaches.add(peach)
+    }
+
+    collectPeach(player, peach) {
+        peach.destroy()
+
+        this.peachCount++
+
+        this.peachText.setText(`PEACHES: ${this.peachCount}`)
+    }
+
     endGame() {
         this.gameOver = true;
         this.physics.pause();
-        this.gameOverText.setText(`Game Over!\n\nYour altitude was: ${this.score}m!`)
+        this.gameOverText.setText(`Game Over!\n\n` + `Altitude: ${this.score}m\n` + `Peaches: ${this.peachCount}\n` + `Final Score: ${this.score + this.peachCount * 50}\n\n` + `Refresh the page to play again!`)
         this.gameOverText.setVisible(true)
     }
 }
