@@ -19,20 +19,19 @@ export default class GameScene extends Phaser.Scene {
 
         this.createPlatform(width / 2, 500)
 
-        this.player = this.physics.add.sprite(width / 2, 500, null)
+        this.player = this.add.rectangle(width / 2, 500, 24, 30, 0x334155)
 
-        this.player.setDisplaySize(24, 30)
-        this.player.body.setSize(24, 30, true)
-        this.player.setTint(0x334155) 
-        this.player.setCollideWorldBounds(false)
-        this.player.setBounce(0)
-        this.player.body.setGravity(900)
-        this.player.setVelocityY(-450)
+        this.physics.add.existing(this.player)
+
+        this.player.body.setSize(24, 30)
+        this.player.body.setCollideWorldBounds(false)
+        this.player.body.setGravityY(900)
+        this.player.body.setVelocityY(-450) // idk why it says it might not exist even though the tooltip has it
 
         this.physics.add.collider(this.player, this.platforms, this.bounce, (player) => player.body.velocity.y > 0, this) // callback
         
         this.cursors = this.input.keyboard.createCursorKeys()
-        this.keys = this.input.keyboard.addKeys({ 'forward': Phaser.Input.Keyboard.W, 'backward': Phaser.Input.Keyboard.S, 'left': Phaser.Input.Keyboard.A, 'right': Phaser.Input.Keyboard.D})
+        this.keys = this.input.keyboard.addKeys({ up: Phaser.Input.Keyboard.KeyCodes.W, down: Phaser.Input.Keyboard.KeyCodes.S, left: Phaser.Input.Keyboard.KeyCodes.A, right: Phaser.Input.Keyboard.KeyCodes.D })
         
         this.cameras.main.setBounds(0, -100000, width, 101000) // x y width height for cam
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1) // no offset
@@ -62,7 +61,7 @@ export default class GameScene extends Phaser.Scene {
 
     bounce(player, platform) {
         if (player.body.velocity.y > 0) {
-            player.setVelocityY(-450)
+            player.body.setVelocityY(-450)
         }
     }
 
@@ -84,12 +83,12 @@ export default class GameScene extends Phaser.Scene {
 
         const speed = 260
 
-        if (this.cursors.left.isDown || this.keys.A.isDown) {
-            this.player.setVelocityX(-speed)
-        } else if (this.cursors.right.isDown || this.keys.D.isDown) {
-            this.player.setVelocityX(speed)
+        if (this.cursors.left.isDown || this.keys.left.isDown) {
+            this.player.body.setVelocityX(-speed)
+        } else if (this.cursors.right.isDown || this.keys.right.isDown) {
+            this.player.body.setVelocityX(speed)
         } else {
-            this.player.setVelocityX(0)
+            this.player.body.setVelocityX(0)
         }
 
         if (this.player.x < 0) {
@@ -105,7 +104,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.generatePlatforms()
 
-        this.platforms.children.iterate((platform) => {
+        this.platforms.getChildren().slice().forEach((platform) => {
             if (platform && platform.y > this.cameras.main.scrollY + this.scale.height + 100) {
                 platform.destroy() // remove platforms that are below the camera -> better performance hopefully
             }
