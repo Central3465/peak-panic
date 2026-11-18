@@ -23,7 +23,9 @@ export default class GameScene extends Phaser.Scene {
 
         this.peaches = this.physics.add.group({ allowGravity: true, immovable: true})
 
-        this.hazards = this.physics.add.group({ allowGravity: false, immovable: true}) // rocks
+        this.hazards = this.physics.add.group() // rocks
+
+        this.powerUps = this.physics.add.group({ allowGravity: true, immovable: true })
 
         this.createPlatform(width / 2, 500)
 
@@ -142,11 +144,12 @@ export default class GameScene extends Phaser.Scene {
             this.nextHazardTime = this.time.now + Phaser.Math.Between(1800, 3500)
         }
 
-        this.hazards.getChildren().slice().forEach((rock) => {
-            if (rock && rock.y > this.cameras.main.scrollY + this.scale.height + 100) {
-                rock.destroy()
+        const cameraBottom = this.cameras.main.scrollY + this.scale.height + 100
+        for (const rock of this.hazards.getChildren().slice()) {
+            if (rock.y > cameraBottom) {
+                this.hazards.remove(rock, true, true)
             }
-        })
+        }
 
         this.peaches.getChildren().slice().forEach((peach) => {
             if (peach && peach.y > this.cameras.main.scrollY + this.scale.height + 100) {
@@ -165,17 +168,21 @@ export default class GameScene extends Phaser.Scene {
         this.showRockWarning(x)
         const rock = this.add.rectangle(x, y, 24, 24, 0x64748b)
 
-        this.physics.add.existing(rock)
-
-        rock.body.setAllowGravity(false)
-        rock.body.setVelocityY(220)
-        rock.body.setImmovable(true)
+        this.physics.add.existing(rock, false)
 
         this.hazards.add(rock)
+
+        rock.body.setAllowGravity(false)
+        rock.body.setImmovable(false)
+        rock.body.setVelocity(0, 250)
+        rock.body.setCollideWorldBounds(false)
     }
 
     hitRock(player, rock) {
-        rock.destroy()
+        if (this.gameOver) return
+
+        this.hazards.remove(rock, true, true)
+
         this.endGame()
     }
 
