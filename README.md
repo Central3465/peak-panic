@@ -39,3 +39,36 @@ Jumping is automatic, so spamming the spacebar will not work. And yes, I have to
 - Vite
 - Node.js
 - PostgreSQL
+
+## Running locally
+### Prerequisites
+- Node.js
+- npm
+
+### Installation
+
+Clone the repo:
+```bash
+git clone https://github.com/Central3465/psychic-octo-chainsaw.git
+cd psychic-octo-chainsaw
+```
+Install dependencies:
+```bash
+npm install
+```
+Start the development server:
+```bash
+npm run dev
+```
+
+## Development Status
+
+It is currently a work in progress, the initial gameplay have been completed with more mechanics, artwork, audio and online featuers planned. It is being developed as part of Hack Club Terra and will be archived in a few days. 
+
+## License
+
+MIT License.
+
+## Contributing
+
+Not encouraged, since this project is only temporary, I don't want you to waste your time writing the code and opening a PR as I might not be able to respond to you. 
