@@ -10,6 +10,8 @@ export default class GameScene extends Phaser.Scene {
         this.gameOver = false
         this.peachCount = 0 // 🍑 i love peaches
         this.lastPlatformX = 0
+        this.hazards = null
+        this.nextHazardTime = 0
     }
 
     create() {
@@ -20,6 +22,8 @@ export default class GameScene extends Phaser.Scene {
         this.platforms = this.physics.add.staticGroup()
 
         this.peaches = this.physics.add.group({ allowGravity: true, immovable: true})
+
+        this.hazards = this.physics.add.group({ allowGravity: false, immovable: true}) // rocks
 
         this.createPlatform(width / 2, 500)
 
@@ -35,6 +39,8 @@ export default class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.player, this.platforms, this.bounce, (player) => player.body.velocity.y > 0, this) // callback
 
         this.physics.add.overlap(this.player, this.peaches, this.collectPeach, null, this) // for player to collect peaches
+
+        this.physics.add.overlap(this.player, this.hazards, this.hitRock, null, this)
         
         this.cursors = this.input.keyboard.createCursorKeys()
         this.keys = this.input.keyboard.addKeys({ up: Phaser.Input.Keyboard.KeyCodes.W, down: Phaser.Input.Keyboard.KeyCodes.S, left: Phaser.Input.Keyboard.KeyCodes.A, right: Phaser.Input.Keyboard.KeyCodes.D })
@@ -80,7 +86,7 @@ export default class GameScene extends Phaser.Scene {
     generatePlatforms() {
         const width = this.scale.width
         const cameraTop = this.cameras.main.scrollY - 900
-        while (this.nextPlatformer > cameraTop) {
+        while (this.nextPlatformY > cameraTop) {
             const difficulty = Math.min(this.score / 1000, 1)
             const platformWidth = Math.max(58, 90 - Math.floor(difficulty * 25))
             const gap = Phaser.Math.Between(85, 100 + Math.floor(difficulty * 12)) // make platforms narrow so game is harder
@@ -128,7 +134,21 @@ export default class GameScene extends Phaser.Scene {
             }
         })
 
-        this.peaches.children.iterate((peach) => {
+        if (this.time.now > this.nextHazardTime) {
+            if (Math.random() < 0.35) {
+                this.createRock()
+            }
+
+            this.nextHazardTime = this.time.now + Phaser.Math.Between(1800, 3500)
+        }
+
+        this.hazards.getChildren().slice().forEach((rock) => {
+            if (rock && rock.y > this.cameras.main.scrollY + this.scale.height + 100) {
+                rock.destroy()
+            }
+        })
+
+        this.peaches.getChildren().slice().forEach((peach) => {
             if (peach && peach.y > this.cameras.main.scrollY + this.scale.height + 100) {
                 peach.destroy()
             }
@@ -137,6 +157,38 @@ export default class GameScene extends Phaser.Scene {
         if (this.player.y > this.cameras.main.scrollY + this.scale.height + 100) {
             this.endGame() // check if player has fallen off lol
         }
+    }
+
+    createRock() {
+        const x = Phaser.Math.Between(35, this.scale.width - 35)
+        const y = this.cameras.main.scrollY - 80
+        this.showRockWarning(x)
+        const rock = this.add.rectangle(x, y, 24, 24, 0x64748b)
+
+        this.physics.add.existing(rock)
+
+        rock.body.setAllowGravity(false)
+        rock.body.setVelocityY(220)
+        rock.body.setImmovable(true)
+
+        this.hazards.add(rock)
+    }
+
+    hitRock(player, rock) {
+        rock.destroy()
+        this.endGame()
+    }
+
+    showRockWarning(x) {
+        const warning = this.add.text(x, 90, "!", { fontSize: "32px", fontFamily: "monospace", color: "#ef4444", fontStyle: "bold"})
+
+        warning.setOrigin(0.5)
+        warning.setScrollFactor(0)
+        warning.setDepth(15)
+
+        this.time.delayedCall(700, () => {
+            warning.destroy()
+        })
     }
 
     createPeach(x, y) {
