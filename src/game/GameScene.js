@@ -43,6 +43,8 @@ export default class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.peaches, this.collectPeach, null, this) // for player to collect peaches
 
         this.physics.add.overlap(this.player, this.hazards, this.hitRock, null, this)
+
+        this.physics.add.overlap(this.player, this.powerUps, this.collectSpring, null, this)
         
         this.cursors = this.input.keyboard.createCursorKeys()
         this.keys = this.input.keyboard.addKeys({ up: Phaser.Input.Keyboard.KeyCodes.W, down: Phaser.Input.Keyboard.KeyCodes.S, left: Phaser.Input.Keyboard.KeyCodes.A, right: Phaser.Input.Keyboard.KeyCodes.D })
@@ -52,6 +54,11 @@ export default class GameScene extends Phaser.Scene {
         this.cameras.main.setDeadzone(0, 180) // width height
 
         this.generatePlatforms()
+        this.springBoost = false
+
+        this.powerUpText = this.add.text(16, 76, "", { fontSize: "14px", fontFamily: "monospace", color: "#2acdee", fontStyle: "bold", stroke: "#17324d", strokeThickness: 3})
+        this.powerUpText.setScrollFactor(0)
+        this.powerUpText.setDepth(10)
 
         this.scoreText = this.add.text(16, 16, "Altitude: 0m", { fontSize: "20px", fontFamily: "monospace", color: "#17324d", fontStyle: "bold"})
         this.scoreText.setScrollFactor(0)
@@ -81,7 +88,13 @@ export default class GameScene extends Phaser.Scene {
 
     bounce(player, platform) {
         if (player.body.velocity.y > 0) {
-            player.body.setVelocityY(-500)
+            if (this.springBoost) {
+                player.body.setVelocityY(-750)
+                this.springBoost = false
+                this.powerUpText.setText("")
+            } else {
+                player.body.setVelocityY(-500)
+            }
         }
     }
 
@@ -97,6 +110,9 @@ export default class GameScene extends Phaser.Scene {
             this.createPlatform(x, this.nextPlatformY, platformWidth)
             if (Math.random() < 0.75) {
                 this.createPeach(x, this.nextPlatformY - 30)
+            }
+            if (Math.random() < 0.15) {
+                this.createSpring(x, this.nextPlatformY + 35)
             }
             this.nextPlatformY -= gap;
         }
@@ -126,7 +142,7 @@ export default class GameScene extends Phaser.Scene {
         const totalScore = this.score + this.peachCount * 50
 
         this.score = Math.max(0, Math.floor((500 - this.highestY) / 10))
-        this.scoreText.setText(`Altitude: ${this.score}m\nScore: ${totalScore} peaches`)
+        this.scoreText.setText(`Altitude: ${this.score}m\nScore: ${totalScore}`)
 
         this.generatePlatforms()
 
@@ -215,6 +231,25 @@ export default class GameScene extends Phaser.Scene {
         this.peachCount++
 
         this.peachText.setText(`PEACHES: ${this.peachCount}`)
+    }
+
+    createSpring(x, y) {
+        const spring = this.add.rectangle(x, y, 20, 20, 0xfacc15)
+
+        this.physics.add.existing(spring)
+
+        spring.body.setAllowGravity(false)
+        spring.body.setImmovable(true)
+
+        this.powerUps.add(spring)
+    }
+
+    collectSpring(player, spring) {
+        spring.destroy()
+
+        this.springBoost = true
+
+        this.powerUpText.setText("Spring Boost READY!\nYou can jump higher!")
     }
 
     endGame() {

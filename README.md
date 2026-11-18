@@ -18,14 +18,8 @@ Climb an increasingly challenging mountain using simple keyboard controls.
 - Automatic bouncing when landing on the platforms.
 - Platform collisions and physics!!!
 - Dynamically generated platforms as you go up, they also destroy themselves if they go out of view to save performance!
-
-### What I want to add to the game
-- Collectibles and bonuses.
-- Increasing the difficulty of the game.
-- Falling rocks.
-- Power-ups and checkpoints.
-- Personal high scores.
-- Global leaderboard.
+- Collect peaches as you go up along the way!
+- There's a 15% chance of a power up spawning on a platform which will increase your jump height!
 
 ## Controls
 - Left arrow key / A = Move left
