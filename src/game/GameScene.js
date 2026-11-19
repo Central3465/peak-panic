@@ -29,14 +29,17 @@ export default class GameScene extends Phaser.Scene {
 
         this.createPlatform(width / 2, 500)
 
-        this.player = this.add.rectangle(width / 2, 500, 24, 30, 0x334155)
+        this.createPlayerTexture()
+
+        this.player = this.physics.add.sprite(width / 2, 500, "climber")
 
         this.physics.add.existing(this.player)
 
-        this.player.body.setSize(24, 30)
-        this.player.body.setCollideWorldBounds(false)
+        this.player.setScale(2)
+        this.player.body.setSize(12, 18)
+        this.player.setCollideWorldBounds(false)
         this.player.body.setGravityY(900)
-        this.player.body.setVelocityY(-500) // idk why it says it might not exist even though the tooltip has it
+        this.player.body.setVelocityY(-500)
 
         this.physics.add.collider(this.player, this.platforms, this.bounce, (player) => player.body.velocity.y > 0, this) // callback
 
@@ -176,6 +179,31 @@ export default class GameScene extends Phaser.Scene {
         if (this.player.y > this.cameras.main.scrollY + this.scale.height + 100) {
             this.endGame() // check if player has fallen off lol
         }
+    }
+
+    createPlayerTexture() {
+        if (this.textures.exists("climber")) return
+
+        const graphics = this.make.graphics({ x: 0, y:0, add: false})
+
+        graphics.fillStyle(0x292524)
+        graphics.fillRect(4, 0, 8, 3)
+        graphics.fillStyle(0xf2bd91)
+        graphics.fillRect(4, 3, 8, 6)
+        graphics.fillStyle(0xdc4444)
+        graphics.fillRect(3, 9, 10, 6)
+        graphics.fillStyle(0xf2bd91)
+        graphics.fillRect(0, 9, 3, 5)
+        graphics.fillRect(13, 9, 3, 5)
+        graphics.fillStyle(0x334155)
+        graphics.fillRect(4, 15, 4, 3)
+        graphics.fillRect(9, 15, 4, 3)
+        graphics.fillStyle(0x292524)
+        graphics.fillRect(3, 18, 5, 2)
+        graphics.fillRect(9, 18, 5, 2)
+
+        graphics.generateTexture("climber", 16, 20)
+        graphics.destroy()
     }
 
     createRock() {

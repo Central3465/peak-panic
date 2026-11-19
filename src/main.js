@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import GameScene from "./game/GameScene";
+import MenuScene from "./game/MenuScene";
 import "./style.css";
 
 new Phaser.Game({
@@ -12,6 +13,8 @@ new Phaser.Game({
     default: "arcade",
     arcade: { debug: false }
   },
-  scene: [GameScene],
-  scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH}
+  scene: [MenuScene, GameScene],
+  scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH},
+  pixelArt: true,
+  roundPixels: true
 })
