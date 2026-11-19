@@ -14,16 +14,16 @@ export default class MenuScene extends Phaser.Scene {
 
         mountain.fillStyle(0xffffff)
         mountain.fillPoints([
-            new Phaser.Geom.Point(100, 400),
-            new Phaser.Geom.Point(240, 140),
-            new Phaser.Geom.Point(380, 400)
+            { x: 100, y: 400},
+            { x: 240, y: 140},
+            { x: 300, y: 400}
         ], true)
 
         mountain.fillStyle(0x7896a5)
         mountain.fillPoints([
-            new Phaser.Geom.Point(0, 500),
-            new Phaser.Geom.Point(150, 300),
-            new Phaser.Geom.Point(300, 500)
+            { x: 0, y: 500},
+            { x: 140, y: 300},
+            { x: 300, y: 500}
         ], true)
 
         this.add.text(width / 2, 140, "Peak Panic", { fontSize: "48px", fontFamily: "monospace", fontStyle: "bold", color: "#17324d", stroke: "#ffffff", strokeThickness: 5}).setOrigin(0.5)
