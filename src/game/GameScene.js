@@ -76,6 +76,16 @@ export default class GameScene extends Phaser.Scene {
         this.gameOverText.setScrollFactor(0)
         this.gameOverText.setVisible(false)
         this.gameOverText.setDepth(20)
+
+        this.restartText = this.add.text(width / 2, height / 2 + 100, "Play Again", { fontSize: "18px", fontFamily: "monospace", color: "#ffffff", backgroundColor: "#426b45", padding: { x: 14, y: 10}})
+        this.restartText.setOrigin(0.5)
+        this.restartText.setScrollFactor(0)
+        this.restartText.setVisible(false)
+        this.restartText.setDepth(21)
+        this.restartText.setInteractive({ useHandCursor: true})
+        this.restartText.on("pointerdown", () => {
+            this.scene.restart()
+        })
     }
 
     createPlatform(x, y, width = 90) {
@@ -281,9 +291,11 @@ export default class GameScene extends Phaser.Scene {
     }
 
     endGame() {
+        if (this.gameOver) return
         this.gameOver = true;
         this.physics.pause();
-        this.gameOverText.setText(`Game Over!\n\n` + `Altitude: ${this.score}m\n` + `Peaches: ${this.peachCount}\n` + `Final Score: ${this.score + this.peachCount * 50}\n\n` + `Refresh the page to play again!`)
+        this.gameOverText.setText(`Game Over!\n\n` + `Altitude: ${this.score}m\n` + `Peaches: ${this.peachCount}\n` + `Final Score: ${this.score + this.peachCount * 50}\n\n`)
         this.gameOverText.setVisible(true)
+        this.restartText.setVisible(true)
     }
 }
