@@ -20,12 +20,15 @@ Climb an increasingly challenging mountain using simple keyboard controls.
 - Dynamically generated platforms as you go up, they also destroy themselves if they go out of view to save performance!
 - Collect peaches as you go up along the way!
 - There's a 15% chance of a power up spawning on a platform which will increase your jump height!
+- There is now a proper main menu and a restart button instead of "refresh the page"!
 
 ## Controls
 - Left arrow key / A = Move left
 - Right arrow key / D = Move right
 
 Jumping is automatic, so spamming the spacebar will not work. And yes, I have to figure out mobile controls soon.
+
+I will link a video here showcasing how to play, as I understand it can be a bit confusing at first.
 
 ## Tech Stack
 - JavaScript
