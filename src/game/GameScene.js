@@ -12,6 +12,10 @@ export default class GameScene extends Phaser.Scene {
         this.lastPlatformX = 0
         this.hazards = null
         this.nextHazardTime = 0
+        this.currentCheckpoint = 0
+        this.nextCheckpointAltitude = 500
+        this.checkpoints = []
+        this.currentZone = null
     }
 
     create() {
@@ -27,6 +31,10 @@ export default class GameScene extends Phaser.Scene {
         this.gameOver = false
         this.springBoost = false
         this.nextHazardTime = 0
+        this.currentCheckpoint = 0
+        this.nextCheckpointAltitude = 500
+        this.checkpoints = []
+        this.currentZone = null
 
         this.cameras.main.setBackgroundColor("#9bd8ed")
 
@@ -99,6 +107,16 @@ export default class GameScene extends Phaser.Scene {
         this.restartText.on("pointerdown", () => {
             this.scene.restart()
         })
+
+        this.checkpointText = this.add.text(16, 104, "Checkpoint: none reached", { fontSize: "13px", fontFamily: "monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
+        this.checkpointText.setScrollFactor(0)
+        this.checkpointText.setDepth(10)
+
+        this.notificationText = this.add.text(width / 2, 150, "", { fontSize: "20px", fontFamily: "monospace", fontStyle: "bold", color: "#22c55e", stroke: "#17324d", strokeThickness: 4})
+        this.notificationText.setOrigin(0.5)
+        this.notificationText.setScrollFactor(0)
+        this.notificationText.setDepth(15)
+        this.notificationText.setVisible(false)
     }
 
     createPlatform(x, y, width = 90) {
@@ -134,6 +152,11 @@ export default class GameScene extends Phaser.Scene {
             const maxShift = 110 + Math.floor(difficulty * 30) 
             const x = Phaser.Math.Clamp(this.lastPlatformX + Phaser.Math.Between(-maxShift, maxShift), 55, width - 55)
             this.createPlatform(x, this.nextPlatformY, platformWidth)
+            const platformAltitude = Math.max(0, Math.floor((500-this.nextPlatformY) / 10))
+            if (platformAltitude >= this.nextCheckpointAltitude) {
+                this.createCheckpoint(x, this.nextPlatformY - 35, this.nextCheckpointAltitude)
+                this.nextCheckpointAltitude += 500
+            }
             if (Math.random() < 0.75) {
                 this.createPeach(x, this.nextPlatformY - 30)
             }
@@ -190,6 +213,14 @@ export default class GameScene extends Phaser.Scene {
         for (const rock of this.hazards.getChildren().slice()) {
             if (rock.y > cameraBottom) {
                 this.hazards.remove(rock, true, true)
+            }
+        }
+
+        for (const checkpoint of this.checkpoints.slice()) {
+            if (checkpoint.y > cameraBottom) {
+                checkpoint.decoration.destroy()
+                checkpoint.destroy()
+                this.checkpoints = this.checkpoints.filter(item=> item !== checkpoint)
             }
         }
 
@@ -301,6 +332,51 @@ export default class GameScene extends Phaser.Scene {
         this.springBoost = true
 
         this.powerUpText.setText("Spring Boost READY!\nYou can jump higher!")
+    }
+
+    createCheckpoint(x, y, altitude) {
+        const checkpoint = this.add.rectangle(x, y, 36, 40, 0xfacc15, 0.15)
+
+        this.physics.add.existing(checkpoint, true)
+
+        checkpoint.setData("altitude", altitude)
+        checkpoint.setData("activated", false)
+
+        const flag = this.add.graphics()
+
+        flag.fillStyle(0x713f12)
+        flag.fillRect(x-3, y-20, 4, 40)
+        flag.fillStyle(0xef4444)
+        flag.fillRect(x+1, y-20, 20, 12)
+
+        checkpoint.decoration = flag
+
+        this.physics.add.overlap(this.player, checkpoint, () => this.reachCheckpoint(checkpoint), null, this)
+
+        this.checkpoints.push(checkpoint)
+    }
+
+    reachCheckpoint(checkpoint) {
+        if (checkpoint.getData("activated")) return
+
+        const altitude = checkpoint.getData("altitude")
+
+        checkpoint.setData("activated", true)
+        checkpoint.body.enable = false
+
+        this.currentCheckpoint = altitude
+
+        checkpoint.decoration.clear()
+
+        checkpoint.decoration.fillStyle(0x713f12)
+        checkpoint.decoration.fillRect(checkpoint.x-3, checkpoint.y-20, 4, 40)
+        checkpoint.decoration.fillStyle(0x22c55e)
+        checkpoint.decoration.fillRect(checkpoint.x+1, checkpoint.y-20, 20, 12)
+
+        this.checkpointText.setText(`Checkpoint: ${altitude}m`)
+        this.notificationText.setText("Checkpoint reached!!")
+        this.notificationText.setVisible(true)
+        this.time.delayedCall(2000, () => {this.notificationText.setVisible(false)})
     }
 
     endGame() {
