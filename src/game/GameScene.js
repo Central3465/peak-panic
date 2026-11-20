@@ -35,6 +35,8 @@ export default class GameScene extends Phaser.Scene {
         this.nextCheckpointAltitude = 500
         this.checkpoints = []
         this.currentZone = null
+        this.mobileLeft = false
+        this.mobileRight = false
 
         this.cameras.main.setBackgroundColor("#9bd8ed")
 
@@ -70,6 +72,7 @@ export default class GameScene extends Phaser.Scene {
         
         this.cursors = this.input.keyboard.createCursorKeys()
         this.keys = this.input.keyboard.addKeys({ up: Phaser.Input.Keyboard.KeyCodes.W, down: Phaser.Input.Keyboard.KeyCodes.S, left: Phaser.Input.Keyboard.KeyCodes.A, right: Phaser.Input.Keyboard.KeyCodes.D })
+        this.isMobile = this.sys.game.device.input.touch
         
         this.cameras.main.setBounds(0, -100000, width, 101000) // x y width height for cam
         this.cameras.main.stopFollow()
@@ -121,6 +124,9 @@ export default class GameScene extends Phaser.Scene {
         this.zoneText = this.add.text(16, 130, "Zone: Foothills", { fontSize: "13px", fontFamily: "monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
         this.zoneText.setScrollFactor(0)
         this.zoneText.setDepth(10)
+
+        this.input.addPointer(1) // for simultaneous two thumb touches
+        this.createMobileControls()
     }
 
     createPlatform(x, y, width = 90) {
@@ -176,12 +182,14 @@ export default class GameScene extends Phaser.Scene {
 
         const speed = 260
 
-        if (this.cursors.left.isDown || this.keys.left.isDown) {
-            this.player.body.setVelocityX(-speed)
-        } else if (this.cursors.right.isDown || this.keys.right.isDown) {
-            this.player.body.setVelocityX(speed)
+        const movingLeft = this.cursors.left.isDown || this.keys.A.isDown || this.mobileLeft
+        const movingRight = this.cursors.right.isDown || this.keys.D.isDown || this.mobileRight
+        if (movingLeft && !movingRight) {
+            this.player.setVelocityX(-speed)
+        } else if (movingRight && !movingLeft) {
+            this.player.setVelocityX(speed)
         } else {
-            this.player.body.setVelocityX(0)
+            this.player.setVelocityX(0)
         }
 
         if (this.player.x < 0) {
@@ -410,6 +418,43 @@ export default class GameScene extends Phaser.Scene {
         }
     }
 
+    createMobileControls() {
+        if (!this.isMobile) return
+
+        const { width, height } = this.scale
+
+        this.mobileLeft = false
+        this.mobileRight = false
+
+        this.leftButton.setScrollFactor(0)
+        this.leftButton.setDepth(30)
+        this.leftButton.setInteractive()
+
+        this.leftArrow = this.add.text(75, height-85, "◀️", { fontSize: "38px", color: "#ffffff"})
+        this.leftArrow.setOrigin(0.5)
+        this.leftArrow.setScrollFactor(0)
+        this.leftArrow.setDepth(31)
+
+        this.rightButton.setScrollFactor(0)
+        this.rightButton.setDepth(30)
+        this.rightButton.setInteractive()
+
+        this.rightArrow = this.add.text(width-75, height-85, "▶️", { fontSize: "38px", color: "#ffffff"})
+        this.rightArrow.setOrigin(0.5)
+        this.rightArrow.setScrollFactor(0)
+        this.rightArrow.setDepth(31)
+
+        this.leftButton.on("pointerdown", () => {this.mobileLeft = true})
+        this.leftButton.on("pointerup", () => {this.mobileLeft = false})
+        this.leftButton.on("pointerout", () => {this.mobileLeft = false})
+        this.leftButton.on("pointerupoutside", () => {this.mobileLeft = false})
+
+        this.rightButton.on("pointerdown", () => {this.mobileRight = true})
+        this.rightButton.on("pointerup", () => {this.mobileRight = false})
+        this.rightButton.on("pointerout", () => {this.mobileRight = false})
+        this.rightButton.on("pointerupoutside", () => {this.mobileRight  = false})
+    }
+
     endGame() {
         if (this.gameOver) return
         this.gameOver = true;
@@ -417,5 +462,7 @@ export default class GameScene extends Phaser.Scene {
         this.gameOverText.setText(`Game Over!\n\n` + `Altitude: ${this.score}m\n` + `Peaches: ${this.peachCount}\n` + `Final Score: ${this.score + this.peachCount * 50}\n\n`)
         this.gameOverText.setVisible(true)
         this.restartText.setVisible(true)
+        this.mobileLeft = false
+        this.mobileRight = false
     }
 }
