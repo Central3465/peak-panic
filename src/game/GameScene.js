@@ -117,6 +117,10 @@ export default class GameScene extends Phaser.Scene {
         this.notificationText.setScrollFactor(0)
         this.notificationText.setDepth(15)
         this.notificationText.setVisible(false)
+
+        this.zoneText = this.add.text(16, 130, "Zone: Foothills", { fontSize: "13px", fontFamily: "monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
+        this.zoneText.setScrollFactor(0)
+        this.zoneText.setDepth(10)
     }
 
     createPlatform(x, y, width = 90) {
@@ -191,6 +195,7 @@ export default class GameScene extends Phaser.Scene {
         const totalScore = this.score + this.peachCount * 50
 
         this.score = Math.max(0, Math.floor((500 - this.highestY) / 10))
+        this.updateMountainZone()
         this.scoreText.setText(`Altitude: ${this.score}m\nScore: ${totalScore}`)
 
         this.generatePlatforms()
@@ -377,6 +382,32 @@ export default class GameScene extends Phaser.Scene {
         this.notificationText.setText("Checkpoint reached!!")
         this.notificationText.setVisible(true)
         this.time.delayedCall(2000, () => {this.notificationText.setVisible(false)})
+    }
+
+    // i want to add image backgrounds for the different zones but static colours will do for now
+    updateMountainZone() {
+        let zone
+        let background
+
+        if (this.score < 500) {
+            zone = "Foothills" // i think that's what you call it the bottom
+            background = "#9bd8ed"
+        } else if (this.score < 1500) {
+            zone = "Alpine" // according to google this means above the tree line
+            background = "#7eb9dc"
+        } else if (this.score < 3000) {
+            zone = "Snowline"
+            background = "#426b91"
+        } else {
+            zone = "Summit"
+            background = "#594b78"
+        }
+
+        if (zone !== this.currentZone) {
+            this.currentZone = null
+            this.cameras.main.setBackgroundColor(background)
+            this.zoneText.setText(`Zone: ${zone}`)
+        }
     }
 
     endGame() {
