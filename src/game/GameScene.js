@@ -182,6 +182,12 @@ export default class GameScene extends Phaser.Scene {
 
         const speed = 260
 
+        this.cursors = this.input.keyboard.createCursorKeys()
+        this.keys = this.input.keyboard.addKeys({
+            A: Phaser.Input.Keyboard.KeyCodes.A,
+            D: Phaser.Input.Keyboard.KeyCodes.D
+        })
+
         const movingLeft = this.cursors.left.isDown || this.keys.A.isDown || this.mobileLeft
         const movingRight = this.cursors.right.isDown || this.keys.D.isDown || this.mobileRight
         if (movingLeft && !movingRight) {
@@ -426,6 +432,8 @@ export default class GameScene extends Phaser.Scene {
         this.mobileLeft = false
         this.mobileRight = false
 
+        this.leftButton = this.add.circle(75, height-85, 48, 0x17324d, 0.65)
+
         this.leftButton.setScrollFactor(0)
         this.leftButton.setDepth(30)
         this.leftButton.setInteractive()
@@ -434,6 +442,8 @@ export default class GameScene extends Phaser.Scene {
         this.leftArrow.setOrigin(0.5)
         this.leftArrow.setScrollFactor(0)
         this.leftArrow.setDepth(31)
+
+        this.rightButton = this.add.circle(width-75, height-85, 48, 0x17324d, 0.65)
 
         this.rightButton.setScrollFactor(0)
         this.rightButton.setDepth(30)
