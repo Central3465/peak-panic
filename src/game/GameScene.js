@@ -37,6 +37,7 @@ export default class GameScene extends Phaser.Scene {
         this.currentZone = null
         this.mobileLeft = false
         this.mobileRight = false
+        this.scoreSubmitted = false
 
         this.cameras.main.setBackgroundColor("#9bd8ed")
 
@@ -124,6 +125,12 @@ export default class GameScene extends Phaser.Scene {
         this.zoneText = this.add.text(16, 130, "Zone: Foothills", { fontSize: "13px", fontFamily: "monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
         this.zoneText.setScrollFactor(0)
         this.zoneText.setDepth(10)
+
+        this.submissionText = this.add.text(this.scale.width/2, this.scale.height-35, "", { fontSize: "13px", fontFamily: "monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
+        this.submissionText.setOrigin(0.5)
+        this.submissionText.setScrollFactor(0)
+        this.submissionText.setDepth(25)
+        this.submissionText.setVisible(false)
 
         this.input.addPointer(1) // for simultaneous two thumb touches
         this.createMobileControls()
@@ -465,6 +472,48 @@ export default class GameScene extends Phaser.Scene {
         this.rightButton.on("pointerupoutside", () => {this.mobileRight  = false})
     }
 
+    async submitScore() {
+        if (this.scoreSubmitted) return
+
+        this.scoreSubmitted = true
+
+        const username = localStorage.getItem("username")
+
+        if (!username) {
+            this.submissionText.setText("No username found")
+            this.submissionText.setVisible(true)
+            return
+        }
+
+        const finalScore = this.score + this.peachCount * 50
+
+        this.submissionText.setText("Submitting score...")
+        this.submissionText.setVisible(true)
+
+        try {
+            const response = await fetch("/api/scores", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({username, score: finalScore, altitude: this.score, peaches: this.peachCount})
+            })
+
+            // a 502 from the proxy has an invalid body, so don't assume JSON
+            const data = await response.json().catch(() => ({}))
+
+            if (!response.ok) {
+                throw new Error(data.error || `score submission failed (HTTP ${response.status})`)
+            }
+
+            this.submissionText.setText("Score submitted successfully!")
+
+            this.submissionText.setColor("#4ade80")
+        } catch (error) {
+            console.error("error submitting score", error)
+            this.submissionText.setText("Score submission failed, if this fails after trying again, open an issue")
+            this.submissionText.setColor("#f87171")
+        }
+    }
+
     endGame() {
         if (this.gameOver) return
         this.gameOver = true;
@@ -474,5 +523,6 @@ export default class GameScene extends Phaser.Scene {
         this.restartText.setVisible(true)
         this.mobileLeft = false
         this.mobileRight = false
+        this.submitScore()
     }
 }

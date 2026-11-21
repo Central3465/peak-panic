@@ -42,7 +42,8 @@ const scoreLimiter = rateLimit({
 
 app.post("/api/scores", scoreLimiter, async (req, res) => {
     try {
-        const { username, score, altitude, peaches} = req.body
+        // Express 5 leaves req.body undefined when the request has no JSON body
+        const { username, score, altitude, peaches} = req.body ?? {}
 
         if ( typeof username !== "string" || !/^[a-zA-Z0-9_]{3,20}$/.test(username)) { // i hate regex
             return res.status(400).json({ error: "username must be 3-20 characters and contain only letters, nummbers or underscores."})

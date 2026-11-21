@@ -32,13 +32,33 @@ export default class MenuScene extends Phaser.Scene {
 
         const startButton = this.add.text(width / 2, 340, "Play", { fontSize: "20px", fontFamily: "monospace", color: "#ffffff", backgroundColor: "#426b45", padding: { x: 16, y: 12}})
         const leaderboardButton = this.add.text(width/2, 410, "Global Leaderboard", { fontSize: "16px", fontFamily: "monospace", color: "#ffffff", backgroundColor: "#334155", padding: {x:14, y:10}})
+        const changeNameButton = this.add.text(width/2, 465, "Change username", { fontSize: "14px", fontfamily: "monospace", color: "#ffffff", backgroundColor: "#334155", padding: {x:12,y:9}})
 
         leaderboardButton.setOrigin(0.5)
         leaderboardButton.setInteractive({useHandCursor: true})
         startButton.setOrigin(0.5)
         startButton.setInteractive({ useHandCursor: true})
+        changeNameButton.setOrigin(0.5)
+        changeNameButton.setInteractive({useHandCursor: true})
 
         startButton.on("pointerdown", () => {
+            let username = localStorage.getItem("username")
+
+            if (!username) {
+                username = window.prompt("Choose your username:")
+
+                if (username === null) return
+
+                username = username.trim()
+
+                if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+                    window.alert("username must be 3-20 characters and contain only letters, numbers or underscores.")
+                    return
+                }
+
+                localStorage.setItem("username", username) // yes i know that anyone can impersonate other people
+            }
+
             this.scene.start("GameScene")
         })
 
@@ -53,6 +73,23 @@ export default class MenuScene extends Phaser.Scene {
         leaderboardButton.on("pointerdown", () => {this.scene.start("LeaderboardScene")})
         leaderboardButton.on("pointerover", () => {leaderboardButton.setColor("#facc15")})
         leaderboardButton.on("pointerout", () => {leaderboardButton.setColor("#ffffff")})
+
+        changeNameButton.on("pointerdown", () => {
+            const username = window.prompt("Enter your new username:", localStorage.getItem("username") || "")
+
+            if (username === null) return
+
+            const cleaned = username.trim()
+
+            if (!/^[a-zA-Z0-9_]{3,20}$/.test(cleaned)) {
+                window.alert("invalid username!")
+                return
+            }
+
+            localStorage.setItem("username", cleaned)
+            
+            window.alert("Username updated!")
+        })
 
         this.add.text(width / 2, height - 45, "A BAI Studio production", { fontSize: "12px", fontFamily: "monospace", color: "#17324d"}).setOrigin(0.5)
     }
