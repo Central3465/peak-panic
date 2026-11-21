@@ -189,14 +189,8 @@ export default class GameScene extends Phaser.Scene {
 
         const speed = 260
 
-        this.cursors = this.input.keyboard.createCursorKeys()
-        this.keys = this.input.keyboard.addKeys({
-            A: Phaser.Input.Keyboard.KeyCodes.A,
-            D: Phaser.Input.Keyboard.KeyCodes.D
-        })
-
-        const movingLeft = this.cursors.left.isDown || this.keys.A.isDown || this.mobileLeft
-        const movingRight = this.cursors.right.isDown || this.keys.D.isDown || this.mobileRight
+        const movingLeft = this.cursors.left.isDown || this.keys.left.isDown || this.mobileLeft
+        const movingRight = this.cursors.right.isDown || this.keys.right.isDown || this.mobileRight
         if (movingLeft && !movingRight) {
             this.player.setVelocityX(-speed)
         } else if (movingRight && !movingLeft) {
@@ -425,7 +419,7 @@ export default class GameScene extends Phaser.Scene {
         }
 
         if (zone !== this.currentZone) {
-            this.currentZone = null
+            this.currentZone = zone
             this.cameras.main.setBackgroundColor(background)
             this.zoneText.setText(`Zone: ${zone}`)
         }

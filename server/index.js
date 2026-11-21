@@ -1,8 +1,13 @@
 import express from "express"
 import rateLimit from "express-rate-limit"
 import pool, { startDatabase } from "./db.js"
+import path from "node:path"
+import { fileURLToPath } from "node:url"
 
 const app = express()
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const distPath = path.join(__dirname, "../dist")
 const PORT = process.env.PORT || 3000
 
 app.use(express.json({ limit: "10kb"}))
@@ -127,4 +132,8 @@ app.get("/api/players/:username/best", async (req, res) => {
     }
 })
 
+app.use(express.static(distPath))
+app.get(/^(?!\/api).*/, (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"))
+})
 startServer()
