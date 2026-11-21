@@ -31,9 +31,12 @@ export default class MenuScene extends Phaser.Scene {
         this.add.text(width / 2, 205, "Climb to the top!", { fontSize: "12px", fontFamily: "monospace", color: "#17324d"}).setOrigin(0.5)
 
         const startButton = this.add.text(width / 2, 340, "Play", { fontSize: "20px", fontFamily: "monospace", color: "#ffffff", backgroundColor: "#426b45", padding: { x: 16, y: 12}})
+        const leaderboardButton = this.add.text(width/2, 410, "Global Leaderboard", { fontSize: "16px", fontFamily: "monospace", color: "#ffffff", backgroundColor: "#334155", padding: {x:14, y:10}})
 
+        leaderboardButton.setOrigin(0.5)
+        leaderboardButton.setInteractive({useHandCursor: true})
         startButton.setOrigin(0.5)
-        startButton.setInteractive({ useHandCusor: true})
+        startButton.setInteractive({ useHandCursor: true})
 
         startButton.on("pointerdown", () => {
             this.scene.start("GameScene")
@@ -46,6 +49,10 @@ export default class MenuScene extends Phaser.Scene {
         startButton.on("pointerout", () => {
             startButton.setScale(1)
         })
+
+        leaderboardButton.on("pointerdown", () => {this.scene.start("LeaderboardScene")})
+        leaderboardButton.on("pointerover", () => {leaderboardButton.setColor("#facc15")})
+        leaderboardButton.on("pointerout", () => {leaderboardButton.setColor("#ffffff")})
 
         this.add.text(width / 2, height - 45, "A BAI Studio production", { fontSize: "12px", fontFamily: "monospace", color: "#17324d"}).setOrigin(0.5)
     }
