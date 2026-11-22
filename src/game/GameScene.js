@@ -38,6 +38,9 @@ export default class GameScene extends Phaser.Scene {
         this.mobileLeft = false
         this.mobileRight = false
         this.scoreSubmitted = false
+        this.magnetActive = false
+        this.magnetEndTime = 0
+        this.shieldActive = false
 
         this.cameras.main.setBackgroundColor("#9bd8ed")
 
@@ -69,7 +72,7 @@ export default class GameScene extends Phaser.Scene {
 
         this.physics.add.overlap(this.player, this.hazards, this.hitRock, null, this)
 
-        this.physics.add.overlap(this.player, this.powerUps, this.collectSpring, null, this)
+        this.physics.add.overlap(this.player, this.powerUps, this.collectPowerUp, null, this)
         
         this.cursors = this.input.keyboard.createCursorKeys()
         this.keys = this.input.keyboard.addKeys({ up: Phaser.Input.Keyboard.KeyCodes.W, down: Phaser.Input.Keyboard.KeyCodes.S, left: Phaser.Input.Keyboard.KeyCodes.A, right: Phaser.Input.Keyboard.KeyCodes.D })
@@ -132,6 +135,10 @@ export default class GameScene extends Phaser.Scene {
         this.submissionText.setDepth(25)
         this.submissionText.setVisible(false)
 
+        this.abilityText = this.add.text(16, 158, "", { fontSize: "13px", fontFamily: "monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
+        this.abilityText.setScrollFactor(0)
+        this.abilityText.setDepth(10)
+
         this.input.addPointer(1) // for simultaneous two thumb touches
         this.createMobileControls()
     }
@@ -180,6 +187,13 @@ export default class GameScene extends Phaser.Scene {
             if (Math.random() < 0.15) {
                 this.createSpring(x, this.nextPlatformY + 35)
             }
+            if (Math.random() < 0.06) {
+                this.createMagnet(x, this.nextPlatformY - 45)
+            }
+
+            if (Math.random() < 0.04) {
+                this.createShield(x, this.nextPlatformY - 45)
+            }
             this.nextPlatformY -= gap;
         }
     }
@@ -212,6 +226,11 @@ export default class GameScene extends Phaser.Scene {
         this.score = Math.max(0, Math.floor((500 - this.highestY) / 10))
         this.updateMountainZone()
         this.scoreText.setText(`Altitude: ${this.score}m\nScore: ${totalScore}`)
+
+        this.updateMagnet()
+
+        const magnetSeconds = this.magnetActive ? Math.max(0, Math.ceil((this.magnetEndTime - this.time.now) / 1000)) : 0
+        this.abilityText.setText([this.shieldActive ? "Shield: Active" : "", this.magnetActive ? `Magnet: ${magnetSeconds}s` : ""].filter(Boolean).join("\n"))
 
         this.generatePlatforms()
 
@@ -301,6 +320,19 @@ export default class GameScene extends Phaser.Scene {
 
         this.hazards.remove(rock, true, true)
 
+        if (this.shieldActive) {
+            this.shieldActive = false
+
+            this.notificationText.setText("The shield saved your life!")
+            this.notificationText.setVisible(true)
+
+            this.time.delayedCall(1500, () => {
+                this.notificationText.setVisible(false)
+            })
+
+            return
+        }
+
         this.endGame()
     }
 
@@ -346,12 +378,70 @@ export default class GameScene extends Phaser.Scene {
         this.powerUps.add(spring)
     }
 
-    collectSpring(player, spring) {
-        spring.destroy()
+    collectPowerUp(player, powerUp) {
+        const type = powerUp.getData("type") || "spring"
 
-        this.springBoost = true
+        powerUp.destroy()
 
-        this.powerUpText.setText("Spring Boost READY!\nYou can jump higher!")
+        if (type === "spring") {
+            this.springBoost = true
+            this.powerUpText.setText("Spring boost ready!")
+        } 
+
+        if (type === "magnet") {
+            this.magnetActive = true
+            this.magnetEndTime = this.time.now + 8000
+        }
+
+        if (type === "shield") {
+            this.shieldActive = true
+        }
+    }
+
+    createMagnet(x, y) {
+        const magnet = this.add.circle(x, y, 12, 0x3b82f6)
+
+        this.physics.add.existing(magnet)
+
+        magnet.body.setAllowGravity(false)
+        magnet.body.setImmovable(true)
+
+        magnet.setData("type", "magnet")
+        this.powerUps.add(magnet)
+    }
+
+    updateMagnet() {
+        if (!this.magnetActive) return
+
+        if (this.time.now >= this.magnetEndTime) {
+            this.magnetActive = false
+            return
+        }
+
+        for (const peach of this.peaches.getChildren()) {
+            const distance = Phaser.Math.Distance.Between(this.player.x, this.player.y, peach.x, peach.y)
+
+            if (distance < 180) {
+                const angle = Phaser.Math.Angle.Between(peach.x, peach.y, this.player.x, this.player.y,)
+
+                peach.x += Math.cos(angle) * 5
+                peach.y += Math.sin(angle) * 5
+
+                peach.body.updateFromGameObject()
+            }
+        }
+    }
+
+    createShield(x, y) {
+        const shield = this.add.circle(x, y, 12, 0x22c55e)
+
+        this.physics.add.existing(shield)
+
+        shield.body.setAllowGravity(false)
+        shield.body.setImmovable(true)
+
+        shield.setData("type", "shield")
+        this.powerUps.add(shield)
     }
 
     createCheckpoint(x, y, altitude) {
