@@ -41,6 +41,7 @@ export default class GameScene extends Phaser.Scene {
         this.magnetActive = false
         this.magnetEndTime = 0
         this.shieldActive = false
+        this.isPaused = false
 
         this.cameras.main.setBackgroundColor("#9bd8ed")
 
@@ -77,6 +78,8 @@ export default class GameScene extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys()
         this.keys = this.input.keyboard.addKeys({ up: Phaser.Input.Keyboard.KeyCodes.W, down: Phaser.Input.Keyboard.KeyCodes.S, left: Phaser.Input.Keyboard.KeyCodes.A, right: Phaser.Input.Keyboard.KeyCodes.D })
         this.isMobile = this.sys.game.device.input.touch
+        this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P)
+        this.escapeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC)
         
         this.cameras.main.setBounds(0, -100000, width, 101000) // x y width height for cam
         this.cameras.main.stopFollow()
@@ -141,6 +144,69 @@ export default class GameScene extends Phaser.Scene {
 
         this.input.addPointer(1) // for simultaneous two thumb touches
         this.createMobileControls()
+
+        this.pauseOverlay = this.add.container(0,0)
+        this.pauseOverlay.setScrollFactor(0)
+        this.pauseOverlay.setDepth(100)
+        this.pauseOverlay.setVisible(false)
+
+        const shade = this.add.rectangle(width/2, height/2, width, height, 0x000000, 0.75)
+        shade.setScrollFactor(0)
+
+        const pausedTitle = this.add.text(width/2, height/2 - 150, "Game Paused", { fontSize: "36px", fontFamily: "Terra, monospace", color: "#facc15", fontStyle: "bold"}).setOrigin(0.5)
+        pausedTitle.setScrollFactor(0)
+
+        this.pauseOverlay.add([shade, pausedTitle])
+
+        this.createPauseButton(width/2, height/2-45, "Resume", () => {this.resumeGame()})
+
+        this.createPauseButton(width/2, height / 2 + 25, "Restart", () => {this.scene.restart()})
+
+        this.createPauseButton(width/2, height / 2 + 95, "Main Menu", () => {this.scene.start("MenuScene")})
+
+        this.pauseButton = this.add.text(width-18, 18, "⏸️", { fontSize: "28px", fontFamily: "Terra, monospace", color: "#ffffff", backgroundColor: "#17324d", padding: {x:12, y:8}})
+        this.pauseButton.setOrigin(1,0)
+        this.pauseButton.setScrollFactor(0)
+        this.pauseButton.setDepth(30)
+        this.pauseButton.setInteractive({useHandCursor: true})
+        this.pauseButton.on("pointerdown", () => {
+            this.pauseGame()
+        })
+    }
+
+    createPauseButton(x, y, label, callback) {
+        const button = this.add.text(x, y, `${label}`, { fontSize: "20px", fontFamily: "Terra, monospace", color: "#ffffff", backgroundColor: "#334155", padding: { x: 18, y:12}})
+
+        button.setOrigin(0.5)
+        button.setScrollFactor(0) // container scrollFactor doesn't transfer to children
+        button.setInteractive({useHandCursor: true})
+        button.on("pointerdown", callback)
+        button.on("pointerover", () => {button.setColor("#facc15")})
+        button.on("pointerout", () => {button.setColor("#ffffff")})
+
+        this.pauseOverlay.add(button)
+    }
+
+    pauseGame() {
+        if (this.gameOver || this.isPaused) return
+
+        this.isPaused = true
+
+        this.physics.pause()
+        this.time.paused = true
+
+        this.pauseOverlay.setVisible(true)
+    }
+
+    resumeGame() {
+        if (!this.isPaused) return
+
+        this.isPaused = false
+
+        this.pauseOverlay.setVisible(false)
+
+        this.time.paused = false
+        this.physics.resume()
     }
 
     createPlatform(x, y, width = 90) {
@@ -199,7 +265,12 @@ export default class GameScene extends Phaser.Scene {
     }
 
     update() {
-        if (this.gameOver) return;
+        if (this.gameOver || this.isPaused) return
+
+        if (Phaser.Input.Keyboard.JustDown(this.pauseKey) || Phaser.Input.Keyboard.JustDown(this.escapeKey)) {
+            this.pauseGame()
+            return
+        }
 
         const speed = 260
 
