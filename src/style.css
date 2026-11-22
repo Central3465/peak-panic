@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Terra";
+  src: url("/assets/fonts/ATP-Pleasurize.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap
+}
+
 * {
   box-sizing: border-box;
 }
@@ -9,8 +17,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: monospace;
-  overflow: hidden;
+  font-family: "Terra", monospace; /* monospace as backup if terra fails */
+  overflow: hidden
 }
 
 #game {

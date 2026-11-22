@@ -87,25 +87,25 @@ export default class GameScene extends Phaser.Scene {
         this.generatePlatforms()
         this.springBoost = false
 
-        this.powerUpText = this.add.text(16, 76, "", { fontSize: "14px", fontFamily: "monospace", color: "#2acdee", fontStyle: "bold", stroke: "#17324d", strokeThickness: 3})
+        this.powerUpText = this.add.text(16, 178, "", { fontSize: "17px",fontFamily: "Terra, monospace", color: "#2acdee", fontStyle: "bold", stroke: "#17324d", strokeThickness: 3})
         this.powerUpText.setScrollFactor(0)
         this.powerUpText.setDepth(10)
 
-        this.scoreText = this.add.text(16, 16, "Altitude: 0m", { fontSize: "20px", fontFamily: "monospace", color: "#17324d", fontStyle: "bold"})
+        this.scoreText = this.add.text(16, 12, "Altitude: 0m", { fontSize: "24px",fontFamily: "Terra, monospace", color: "#17324d", fontStyle: "bold"})
         this.scoreText.setScrollFactor(0)
         this.scoreText.setDepth(10)
 
-        this.peachText = this.add.text(16, 48, "Peaches: 0", { fontSize: "16px", fontFamily: "monospace", color: "#ffffff", fontStyle: "bold", stroke: "#17324d", strokeThickness: 3})
+        this.peachText = this.add.text(17, 88, "Peaches: 0", { fontSize: "20px",fontFamily: "Terra, monospace", color: "#ffffff", fontStyle: "bold", stroke: "#17324d", strokeThickness: 3})
         this.peachText.setScrollFactor(0)
         this.peachText.setDepth(10)
         
-        this.gameOverText = this.add.text(width / 2, height / 2, "Game over!", { fontSize: "26px", fontFamily: "monospace", color: "#ffffff", align: "center", backgroundColor: "#17324d", padding: {x: 16, y: 16}})
+        this.gameOverText = this.add.text(width / 2, height / 2, "Game over!", { fontSize: "26px", fontFamily: "Terra, monospace", color: "#ffffff", align: "center", backgroundColor: "#17324d", padding: {x: 16, y: 16}})
         this.gameOverText.setOrigin(0.5)
         this.gameOverText.setScrollFactor(0)
         this.gameOverText.setVisible(false)
         this.gameOverText.setDepth(20)
 
-        this.restartText = this.add.text(width / 2, height / 2 + 100, "Play Again", { fontSize: "18px", fontFamily: "monospace", color: "#ffffff", backgroundColor: "#426b45", padding: { x: 14, y: 10}})
+        this.restartText = this.add.text(width / 2, height / 2 + 100, "Play Again", { fontSize: "18px", fontFamily: "Terra, monospace", color: "#ffffff", backgroundColor: "#426b45", padding: { x: 14, y: 10}})
         this.restartText.setOrigin(0.5)
         this.restartText.setScrollFactor(0)
         this.restartText.setVisible(false)
@@ -115,27 +115,27 @@ export default class GameScene extends Phaser.Scene {
             this.scene.restart()
         })
 
-        this.checkpointText = this.add.text(16, 104, "Checkpoint: none reached", { fontSize: "13px", fontFamily: "monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
+        this.checkpointText = this.add.text(16, 124, "Checkpoint: none reached", { fontSize: "16px",fontFamily: "Terra, monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
         this.checkpointText.setScrollFactor(0)
         this.checkpointText.setDepth(10)
 
-        this.notificationText = this.add.text(width / 2, 150, "", { fontSize: "20px", fontFamily: "monospace", fontStyle: "bold", color: "#22c55e", stroke: "#17324d", strokeThickness: 4})
+        this.notificationText = this.add.text(width / 2, 150, "", { fontSize: "20px", fontFamily: "Terra, monospace", fontStyle: "bold", color: "#22c55e", stroke: "#17324d", strokeThickness: 4})
         this.notificationText.setOrigin(0.5)
         this.notificationText.setScrollFactor(0)
         this.notificationText.setDepth(15)
         this.notificationText.setVisible(false)
 
-        this.zoneText = this.add.text(16, 130, "Zone: Foothills", { fontSize: "13px", fontFamily: "monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
+        this.zoneText = this.add.text(16, 150, "Zone: Foothills", { fontSize: "16px",fontFamily: "Terra, monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
         this.zoneText.setScrollFactor(0)
         this.zoneText.setDepth(10)
 
-        this.submissionText = this.add.text(this.scale.width/2, this.scale.height-35, "", { fontSize: "13px", fontFamily: "monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
+        this.submissionText = this.add.text(this.scale.width/2, this.scale.height-35, "", { fontSize: "13px", fontFamily: "Terra, monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
         this.submissionText.setOrigin(0.5)
         this.submissionText.setScrollFactor(0)
         this.submissionText.setDepth(25)
         this.submissionText.setVisible(false)
 
-        this.abilityText = this.add.text(16, 158, "", { fontSize: "13px", fontFamily: "monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
+        this.abilityText = this.add.text(16, 204, "", { fontSize: "16px",fontFamily: "Terra, monospace", color: "#ffffff", stroke: "#17324d", strokeThickness: 3})
         this.abilityText.setScrollFactor(0)
         this.abilityText.setDepth(10)
 
@@ -337,7 +337,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     showRockWarning(x) {
-        const warning = this.add.text(x, 90, "!", { fontSize: "32px", fontFamily: "monospace", color: "#ef4444", fontStyle: "bold"})
+        const warning = this.add.text(x, 90, "!", { fontSize: "32px", fontFamily: "Terra, monospace", color: "#ef4444", fontStyle: "bold"})
 
         warning.setOrigin(0.5)
         warning.setScrollFactor(0)

@@ -26,13 +26,14 @@ export default class MenuScene extends Phaser.Scene {
             { x: 300, y: 500}
         ], true)
 
-        this.add.text(width / 2, 140, "Peak Panic", { fontSize: "48px", fontFamily: "monospace", fontStyle: "bold", color: "#17324d", stroke: "#ffffff", strokeThickness: 5}).setOrigin(0.5)
+        this.add.text(width / 2, 140, "Peak Panic", { fontSize: "48px", fontFamily: "Terra, monospace", fontStyle: "bold", color: "#17324d", stroke: "#ffffff", strokeThickness: 5}).setOrigin(0.5)
 
-        this.add.text(width / 2, 205, "Climb to the top!", { fontSize: "12px", fontFamily: "monospace", color: "#17324d"}).setOrigin(0.5)
+        this.add.text(width / 2, 205, "Climb to the top!", { fontSize: "12px", fontFamily: "Terra, monospace", color: "#17324d"}).setOrigin(0.5)
 
-        const startButton = this.add.text(width / 2, 340, "Play", { fontSize: "20px", fontFamily: "monospace", color: "#ffffff", backgroundColor: "#426b45", padding: { x: 16, y: 12}})
-        const leaderboardButton = this.add.text(width/2, 410, "Global Leaderboard", { fontSize: "16px", fontFamily: "monospace", color: "#ffffff", backgroundColor: "#334155", padding: {x:14, y:10}})
-        const changeNameButton = this.add.text(width/2, 465, "Change username", { fontSize: "14px", fontfamily: "monospace", color: "#ffffff", backgroundColor: "#334155", padding: {x:12,y:9}})
+        const startButton = this.add.text(width / 2, 340, "Play", { fontSize: "20px", fontFamily: "Terra, monospace", color: "#ffffff", backgroundColor: "#426b45", padding: { x: 16, y: 12}})
+        const leaderboardButton = this.add.text(width/2, 410, "Global Leaderboard", { fontSize: "16px", fontFamily: "Terra, monospace", color: "#ffffff", backgroundColor: "#334155", padding: {x:14, y:10}})
+        const changeNameButton = this.add.text(width/2, 465, "Change username", { fontSize: "14px", fontfamily: "Terra, monospace", color: "#ffffff", backgroundColor: "#334155", padding: {x:12,y:9}})
+        const musicButton = this.add.text(width-20, 25, "Music: On", { fontSize: "12px", fontFamily: "Terra, monospace", color: "#ffffff", backgroundColor: "#334155", padding: {x: 10, y:8}})
 
         leaderboardButton.setOrigin(0.5)
         leaderboardButton.setInteractive({useHandCursor: true})
@@ -40,6 +41,13 @@ export default class MenuScene extends Phaser.Scene {
         startButton.setInteractive({ useHandCursor: true})
         changeNameButton.setOrigin(0.5)
         changeNameButton.setInteractive({useHandCursor: true})
+        musicButton.setOrigin(1, 0)
+        musicButton.setInteractive({useHandCursor: true})
+
+        musicButton.on("pointerdown", () => {
+            this.sound.mute = !this.sound.mute
+            musicButton.setText(this.sound.mute ? "Music: Off" : "Music: On")
+        })
 
         startButton.on("pointerdown", () => {
             let username = localStorage.getItem("username")
@@ -58,7 +66,7 @@ export default class MenuScene extends Phaser.Scene {
 
                 localStorage.setItem("username", username) // yes i know that anyone can impersonate other people
             }
-
+            this.startBackgroundMusic()
             this.scene.start("GameScene")
         })
 
@@ -91,6 +99,25 @@ export default class MenuScene extends Phaser.Scene {
             window.alert("Username updated!")
         })
 
-        this.add.text(width / 2, height - 45, "A BAI Studio production", { fontSize: "12px", fontFamily: "monospace", color: "#17324d"}).setOrigin(0.5)
+        this.add.text(width / 2, height - 45, "A BAI Studio production", { fontSize: "12px", fontFamily: "Terra, monospace", color: "#17324d"}).setOrigin(0.5)
+    }
+
+    startBackgroundMusic() {
+        let music = this.sound.get("background-music")
+
+        if (!music) {
+            music = this.sound.add("background-music", {
+                loop: true,
+                volume: 0.25
+            })
+        }
+
+        if (!music.isPlaying) {
+            music.play()
+        }
+    }
+
+    preload() {
+        this.load.audio("background-music", "/assets/audio/town.mp3")
     }
 }

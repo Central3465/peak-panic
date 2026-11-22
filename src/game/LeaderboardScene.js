@@ -10,11 +10,11 @@ export default class LeaderboardScene extends Phaser.Scene {
 
         this.cameras.main.setBackgroundColor("#172033")
 
-        this.add.text(width/2, 55, "Global Leaderboard", { fontSize: "27px", fontFamily: "monospace", fontStyle: "bold", color: "#facc15"}).setOrigin(0.5)
+        this.add.text(width/2, 55, "Global Leaderboard", { fontSize: "27px", fontFamily: "Terra, monospace", fontStyle: "bold", color: "#facc15"}).setOrigin(0.5)
 
-        this.add.text(width/2, 90, "The mountain's finest climbers", { fontSize: "10px", fontFamily: "monospace", color: "#94a3b8"}).setOrigin(0.5)
+        this.add.text(width/2, 90, "The mountain's finest climbers", { fontSize: "10px", fontFamily: "Terra, monospace", color: "#94a3b8"}).setOrigin(0.5)
 
-        this.statusText = this.add.text(width/2, 145, "Loading the scores...", { fontSize: "14px", fontFamily: "monospace", color: "#ffffff"}).setOrigin(0.5)
+        this.statusText = this.add.text(width/2, 145, "Loading the scores...", { fontSize: "14px", fontFamily: "Terra, monospace", color: "#ffffff"}).setOrigin(0.5)
 
         this.entries = this.add.container(0, 0)
 
@@ -29,7 +29,7 @@ export default class LeaderboardScene extends Phaser.Scene {
     }
 
     createButton(x, y, label, callback) {
-        const button = this.add.text(x, y, `[${label}]`, { fontSize: "15px", fontFamily: "monospace", color: "#ffffff", backgroundColor: "#334155", padding: {x:14, y:10}})
+        const button = this.add.text(x, y, `[${label}]`, { fontSize: "15px", fontFamily: "Terra, monospace", color: "#ffffff", backgroundColor: "#334155", padding: {x:14, y:10}})
         button.setOrigin(0.5)
         button.setInteractive({useHandCursor: true})
         button.on("pointerdown", callback)
@@ -80,11 +80,11 @@ export default class LeaderboardScene extends Phaser.Scene {
 
         const row = this.add.rectangle(width/2, y, width-35, 34, 0x334155, 0.9)
 
-        const rank = this.add.text(35, y, `#${index+1}`, { fontSize: "14px", fontFamily: "monospace", color: colour, fontStyle: "bold"}).setOrigin(0, 0.5)
+        const rank = this.add.text(35, y, `#${index+1}`, { fontSize: "14px", fontFamily: "Terra, monospace", color: colour, fontStyle: "bold"}).setOrigin(0, 0.5)
 
-        const username = this.add.text(85, y, player.username, { fontSize: "13px", fontFamily: "monospace", color: "#ffffff"}).setOrigin(0, 0.5)
+        const username = this.add.text(85, y, player.username, { fontSize: "13px", fontFamily: "Terra, monospace", color: "#ffffff"}).setOrigin(0, 0.5)
 
-        const score = this.add.text(width-35, y, `${player.score}`, { fontSize: "14px", fontFamily: "monospace", color: colour, fontStyle: "bold"}).setOrigin(1, 0.5)
+        const score = this.add.text(width-35, y, `${player.score}`, { fontSize: "14px", fontFamily: "Terra, monospace", color: colour, fontStyle: "bold"}).setOrigin(1, 0.5)
 
         this.entries.add([row, rank, username, score])
     }
