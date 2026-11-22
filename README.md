@@ -12,7 +12,7 @@ It's a work in progress. It'll probably be archived in a few days. Unlike my oth
 
 ## Gameplay
 
-Climb an increasingly dangerous mountain using your A and D key or your left and right arrow keys, or you could play on your phone. Yes, I did spend my time making mobile support. 
+Climb an increasingly dangerous mountain using your A and D key or your left and right arrow keys, or you could play on your phone. Yes, I did spend my time making mobile support.
 
 ### Features
 
@@ -24,6 +24,7 @@ Climb an increasingly dangerous mountain using your A and D key or your left and
 - Peaches. Collect them. It's my favourite fruit. 
 - Power-ups with a 15% spawn chance that increase your jump height. Gambling, but make it vertical. 
 - A main menu and a restart button so pressing Ctrl+R is no longer part of your finger load. You're welcome.
+- There is now background music implemented into the game along with the font style from Terra. 
 
 ## Controls
 
@@ -32,10 +33,12 @@ Climb an increasingly dangerous mountain using your A and D key or your left and
 | Left   | Left Arrow / A   |
 | Right  | Right Arrow / D  |
 | Jump   | It's automatic.  |
+| Esc    | Pauses the game. |
+| P      | Pauses the game. |
 
 Mobile controls do exist!! Phaser will automatically detect if your device supports touch and display two buttons on either side of your screen with arrow emojis for the controls. 
 
-I'll link a video here soon showcasing how to play, because it may be confusing, I understand that.
+I'll link a video here soon showcasing how to play, because it may be confusing, I understand that. That is I keep my word, maybe don't actually expect a video as the controls are pretty straight forward and I'm sure you'll get the hang of it. The requirements below state you also need a prefrontal cortex. 
 
 ## Tech Stack
 
@@ -73,6 +76,10 @@ Recent commits suggest my most recent opponent was PostgreSQL database and score
 ## Contributing
 
 Please don't submit "big" features without discussing with me first. Only open a PR if you have the code for a fix or it's a small code change, like a typo or colour change. If you're going to open a PR, ensure your code is tested and it works. If you used AI to generate the code, ensure you test it, you understand it and it works. If you used AI to generated the PR fully with no human intevention, your PR will simply be rejected. 
+
+## Privacy
+
+As I realised at the last minute that I need to include this because I use PostgreSQL database to store user data and just for the sake of it. I only store your scores, your username and the timestamp it was sent to the server. There is nothing bad about that. If you decide to enter something sensitive into the username field, then that's on you and I won't be wasting my time to respond to your deletion requests. However, if you actually have common sense and want to see / delete your data, feel free to open an issue thread. 
 
 ## Credits
 

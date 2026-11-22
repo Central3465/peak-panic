@@ -42,6 +42,7 @@ export default class GameScene extends Phaser.Scene {
         this.magnetEndTime = 0
         this.shieldActive = false
         this.isPaused = false
+        this.time.paused = false // clock may still be paused if we restarted/left from the pause menu
 
         this.cameras.main.setBackgroundColor("#9bd8ed")
 
@@ -671,13 +672,37 @@ export default class GameScene extends Phaser.Scene {
 
     endGame() {
         if (this.gameOver) return
-        this.gameOver = true;
-        this.physics.pause();
-        this.gameOverText.setText(`Game Over!\n\n` + `Altitude: ${this.score}m\n` + `Peaches: ${this.peachCount}\n` + `Final Score: ${this.score + this.peachCount * 50}\n\n`)
+
+        this.gameOver = true
+        this.physics.pause()
+
+        const finalScore = this.score + this.peachCount * 50
+        const username = localStorage.getItem("username")
+        const recordKey = `best_${username}`
+
+        const previousBest = Number(localStorage.getItem(recordKey) || 0)
+
+        const isNewRecord = finalScore > previousBest
+
+        if (isNewRecord) {
+            localStorage.setItem(recordKey, finalScore)
+        }
+
+        this.gameOverText.setText(
+            `Game over!\n\n` +
+            `Altitude: ${this.score}m\n` +
+            `Peaches: ${this.peachCount}\n` +
+            `Final Score: ${finalScore}\n\n` +
+            `Personal Best: ${Math.max(finalScore, previousBest)}\n` +
+            (isNewRecord ? "\nNew Personal Best!" : "")
+        )
+        
         this.gameOverText.setVisible(true)
         this.restartText.setVisible(true)
+
         this.mobileLeft = false
         this.mobileRight = false
+
         this.submitScore()
     }
 }
